@@ -3,22 +3,29 @@ from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 import matplotlib.cm
-from vectors import *
-from math import *
 import numpy as np
 
 
-# def normal(face):
-#     return(cross(subtract(face[1], face[0]), subtract(face[2], face[0])))
+def get_normal(triangle):
+    side1 = triangle[1] - triangle[0]
+    side2 = triangle[2] - triangle[0]
+    normal = np.cross(side1, side2)
+    normal = normal / np.linalg.norm(normal)
 
-# blues = matplotlib.cm.get_cmap('Blues')
+    return normal
 
-# def shade(face,color_map=blues,light=(1,2,3)):
-#     return color_map(1 - dot(unit(normal(face)), unit(light)))
+blues = matplotlib.cm.get_cmap('Blues')
+
+def shade(triangle, light, color_map=blues):
+    normal = get_normal(triangle)
+    lighting = np.dot(normal, light / np.linalg.norm(light))
+    color = color_map(1 - lighting)
+
+    return color
 
 
-light = (1,2,3)
-faces = [
+light = np.array([1, 2, 3])
+faces = np.array([
     [(1,0,0), (0,1,0), (0,0,1)],
     [(1,0,0), (0,0,-1), (0,1,0)],
     [(1,0,0), (0,0,1), (0,-1,0)],
@@ -27,7 +34,7 @@ faces = [
     [(-1,0,0), (0,1,0), (0,0,-1)],
     [(-1,0,0), (0,-1,0), (0,0,1)],
     [(-1,0,0), (0,0,-1), (0,-1,0)],
-]
+])
 
 
 pygame.init()
@@ -54,8 +61,7 @@ while True:
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
     glBegin(GL_TRIANGLES)
     for face in faces:
-        # color = shade(face,blues,light)
-        color = (0,1,0)
+        color = shade(face, light, blues)
         for vertex in face:
             glColor3fv((color[0], color[1], color[2]))
             glVertex3fv(vertex)
