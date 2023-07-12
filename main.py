@@ -84,6 +84,37 @@ up_down_angle = 0.0
 paused = False
 run = True
 
+# Center model in center of coordinates
+translation = np.array([
+    (model[:, :, 0].max() + model[:, :, 0].min()) / 2,
+    (model[:, :, 1].max() + model[:, :, 1].min()) / 2,
+    (model[:, :, 2].max() + model[:, :, 2].min()) / 2,
+])
+model = model - translation
+
+# Rotate model to face to the camera
+x_angle = -90 * (np.pi / 180)
+rot_x = np.array([
+    [1, 0, 0],
+    [0, np.cos(x_angle), -np.sin(x_angle)],
+    [0, np.sin(x_angle), np.cos(x_angle)]
+])
+
+y_angle = -90 * (np.pi / 180)
+rot_y = np.array([
+    [np.cos(y_angle), 0, np.sin(y_angle)],
+    [0, 1, 0],
+    [-np.sin(y_angle), 0, np.cos(y_angle)]
+])
+rot = np.matmul(rot_y, rot_x)
+
+model = np.einsum('km,ijk->ijm', rot, model)
+
+# Scaling to make model smaller
+model[:, :, 0] = model[:, :, 0] / model[:, :, 0].max()
+model[:, :, 1] = model[:, :, 1] / model[:, :, 1].max()
+model[:, :, 2] = model[:, :, 2] / model[:, :, 2].max()
+
 clock = pygame.time.Clock()
 while run:
     for event in pygame.event.get():

@@ -35,7 +35,7 @@ values = values ** 2
 values = values / np.max(values)
 
 tomo = []
-for i in range(20, 40):
+for i in range(0, 40):
     img_path = f'data/mri_{i}.bmp'
     img = np.array(Image.open(img_path))
     tomo.append(img)
