@@ -1,5 +1,4 @@
 import numpy as np
-import pickle
 import json
 
 CUBE_CORNERS = np.array([

@@ -23,7 +23,7 @@ def get_color(triangle, light_color, color_map=blues):
     lighting = np.dot(normal, light_color / np.linalg.norm(light_color))
     color = color_map(1 - lighting)
 
-    return color
+    return light_color
 
 light_pos = np.array([0, 0, 0])
 light_color = np.array([1, 1, 1])
