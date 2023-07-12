@@ -181,18 +181,17 @@ while run:
         glPushMatrix()
 
 
-        # clock.tick()
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glBegin(GL_TRIANGLES)
         for face in model:
-            color = get_color(face, light_color, blues)
+            # color = get_color(face, light_color, blues)
+            color = (1, 1, 1)
             for vertex in face:
                 glColor3fv((color[0], color[1], color[2]))
                 glVertex3fv(vertex)
                 glNormal3fv(get_normal(face))
         glEnd()
 
-        # print(clock.get_fps())
 
         glPopMatrix()
 
