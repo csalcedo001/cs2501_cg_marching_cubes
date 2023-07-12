@@ -7,9 +7,9 @@ from marching_cubes import marching_cubes
 
 
 
-def grid_func(x, y, z, grid, depth_scale=1):
+def grid_func(x, y, z, grid, y_scale=1):
     x = int(x)
-    y = int(y / depth_scale)
+    y = int(y / y_scale)
     z = int(z)
 
     if x < 0 or x >= grid.shape[0]:
@@ -50,7 +50,7 @@ print("Grid shape:", grid.shape)
 lower_bound = np.zeros((3,))
 upper_bound = np.ones((3,)) * (np.array(grid.shape) - 1)
 
-f = lambda x, y, z: grid_func(x, y, z, grid, depth_scale=5)
+f = lambda x, y, z: grid_func(x, y, z, grid, y_scale=5)
 
 
 triangles = marching_cubes(f, args.threshold, lower_bound, upper_bound, step=args.step)
