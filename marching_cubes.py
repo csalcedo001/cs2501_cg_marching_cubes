@@ -1,4 +1,5 @@
 import numpy as np
+import pickle
 import json
 
 CUBE_CORNERS = np.array([
@@ -27,7 +28,7 @@ CUBE_MIDDLE_POINTS = np.array([
     [0, 1, 0.5],
 ])
 
-def marching_cubes(f, lower, upper, step):
+def marching_cubes(f, threshold, lower, upper, step=1):
     """
     Marching cubes algorithm for isosurface extraction.
 
@@ -49,9 +50,9 @@ def marching_cubes(f, lower, upper, step):
     z_points = np.linspace(lower[2], lower[2] + step * shape[2], shape[2])
 
     values = get_values_from_function(f, x_points, y_points, z_points)
-    triangles = get_triangles_from_values(values, step, 0)
+    triangles = get_triangles_from_values(values, step, threshold)
     
-    return triangles
+    return np.array(triangles)
 
 def get_values_from_function(f, x_points, y_points, z_points):
     shape = (len(x_points), len(y_points), len(z_points))
@@ -118,26 +119,20 @@ with open("triangle_table.json", "r") as f:
 
 TRIANGLE_CASES = get_case_table(table_of_case_vertices)
 
-print(TRIANGLE_CASES[0])
-
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
     radius = 3
+    threshold = 0
 
     def f(x, y, z):
         return x ** 2 + y ** 2 + z ** 2 - radius
 
     bound = radius * np.ones((3,))
 
-    triangles = marching_cubes(f, -bound, bound, 1)
+    triangles = marching_cubes(f, threshold, -bound, bound, 1)
+    print("Shape of triangle mesh:", triangles.shape)
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection="3d")
-
-    for triangle in triangles:
-        triangle = np.array(triangle)
-        ax.plot(*triangle.T, c="b")
-
-    plt.show()
+    with open("triangles.pkl", "wb") as f:
+        pickle.dump(triangles, f)
