@@ -50,12 +50,12 @@ with open("model.pkl", "rb") as f:
 
 
 pygame.init()
-display = (400, 300)
+display = (1000, 800)
 scree = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_LIGHTING)
-glDepthFunc(GL_LESS)
+# glDepthFunc(GL_LESS)
 glShadeModel(GL_SMOOTH)
 glEnable(GL_COLOR_MATERIAL)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
@@ -64,7 +64,7 @@ glEnable(GL_LIGHT0)
 glLightfv(GL_LIGHT0, GL_AMBIENT, [0.5, 0.5, 0.5, 1])
 glLightfv(GL_LIGHT0, GL_DIFFUSE, [1.0, 1.0, 1.0, 1])
 
-sphere = gluNewQuadric() 
+sphere = gluNewQuadric()
 
 glMatrixMode(GL_PROJECTION)
 gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
@@ -116,18 +116,24 @@ while run:
         glPushMatrix()
         glLoadIdentity()
 
-        # apply the movment 
+        # apply the movment
+        speed = 0.1
         if keypress[pygame.K_w]:
-            glTranslatef(0,0,0.1)
+            glTranslatef(0, 0, speed)
         if keypress[pygame.K_s]:
-            glTranslatef(0,0,-0.1)
+            glTranslatef(0, 0, -speed)
         if keypress[pygame.K_d]:
-            glTranslatef(-0.1,0,0)
+            glTranslatef(-speed, 0, 0)
         if keypress[pygame.K_a]:
-            glTranslatef(0.1,0,0)
+            glTranslatef(speed, 0, 0)
+        if keypress[pygame.K_SPACE]:
+            glTranslatef(0, -speed, 0)
+        if keypress[pygame.K_LSHIFT]:
+            glTranslatef(0, speed, 0)
 
         # apply the left and right rotation
-        glRotatef(mouseMove[0]*0.1, 0.0, 1.0, 0.0)
+        rot_speed = 0.2
+        glRotatef(mouseMove[0] * rot_speed, 0.0, 1.0, 0.0)
 
         # multiply the current matrix by the get the new view matrix and store the final vie matrix 
         glMultMatrixf(viewMatrix)
