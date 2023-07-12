@@ -18,14 +18,15 @@ def get_normal(triangle):
 
 blues = matplotlib.cm.get_cmap('Blues')
 
-def get_color(triangle, light, color_map=blues):
+def get_color(triangle, light_color, color_map=blues):
     normal = get_normal(triangle)
-    lighting = np.dot(normal, light / np.linalg.norm(light))
+    lighting = np.dot(normal, light_color / np.linalg.norm(light_color))
     color = color_map(1 - lighting)
 
     return color
 
-light = np.array([1, 2, 3])
+light_pos = np.array([0, 0, 0])
+light_color = np.array([1, 1, 1])
 
 
 # pygame.init()
@@ -54,6 +55,7 @@ scree = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
 
 glEnable(GL_DEPTH_TEST)
 glEnable(GL_LIGHTING)
+glDepthFunc(GL_LESS)
 glShadeModel(GL_SMOOTH)
 glEnable(GL_COLOR_MATERIAL)
 glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
@@ -146,10 +148,11 @@ while run:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glBegin(GL_TRIANGLES)
         for face in model:
-            color = get_color(face, light, blues)
+            color = get_color(face, light_color, blues)
             for vertex in face:
                 glColor3fv((color[0], color[1], color[2]))
                 glVertex3fv(vertex)
+                glNormal3fv(get_normal(face))
         glEnd()
 
         # print(clock.get_fps())
