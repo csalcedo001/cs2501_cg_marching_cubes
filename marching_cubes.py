@@ -68,21 +68,26 @@ def get_values_from_function(f, x_points, y_points, z_points):
 def get_triangles_from_values(values, scale, threshold):
     triangles = []
 
+    print("Total points:", values.shape[0] * values.shape[1] * values.shape[2])
     for i in range(values.shape[0] - 1):
         for j in range(values.shape[1] - 1):
             for k in range(values.shape[2] - 1):
-                ref_idx = np.array([i, j, k])
+                print(f"pos ({i}, {j}, {k})")
+                ref_idx = np.array([[i, j, k]])
                 corner_idxs = CUBE_CORNERS + ref_idx
 
                 corners = []
                 for corner_idx in corner_idxs:
                     corners.append(values[tuple(corner_idx)])
                 corners = np.array(corners)
+                print(f"- corners: {corners}")
                 
                 signs = corners > threshold
+                print(f"- signs: {signs}")
+                print(f"- signs: {2 ** np.arange(8) * signs}")
 
-                case_idx = int(np.sum(2 ** signs))
-                # print(case_idx)
+                case_idx = int(np.sum(signs * 2 ** np.arange(8)))
+                print(f"- case: {case_idx}")
                 case_triangle_vertices = TRIANGLE_CASES[case_idx]
 
                 case_triangles = []
@@ -90,8 +95,11 @@ def get_triangles_from_values(values, scale, threshold):
                     case_triangles.append(CUBE_MIDDLE_POINTS[case_triangle_vertex])
                 case_triangles = np.array(case_triangles)
 
-                case_triangles += ref_idx
-                case_triangles *= scale
+                print(f"- case_triangles.shape: {case_triangles.shape}")
+                print(f"- refidx.shape: {ref_idx.shape}")
+                if len(case_triangles) > 0:
+                    case_triangles += ref_idx
+                    case_triangles *= scale
 
                 triangles += case_triangles.tolist()
     
@@ -123,15 +131,19 @@ if __name__ == "__main__":
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
-    radius = 3
+    radius = 1.5
+    plot_range_scale = 2
     threshold = 0
+    step = 1
+
+    print("Expected ", ((plot_range_scale * 2) // step) ** 3, " boxes")
 
     def f(x, y, z):
         return x ** 2 + y ** 2 + z ** 2 - radius
 
-    bound = radius * np.ones((3,))
+    bound = plot_range_scale * np.ones((3,))
 
-    triangles = marching_cubes(f, threshold, -bound, bound, 1)
+    triangles = marching_cubes(f, threshold, -bound, bound, step)
     print("Shape of triangle mesh:", triangles.shape)
 
     with open("triangles.pkl", "wb") as f:
