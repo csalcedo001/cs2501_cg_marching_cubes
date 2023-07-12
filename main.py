@@ -4,6 +4,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import matplotlib.cm
 import numpy as np
+import pickle
 
 
 
@@ -53,6 +54,10 @@ model = np.array([
     [(-1,0,0), (0,-1,0), (0,0,1)],
     [(-1,0,0), (0,0,-1), (0,-1,0)],
 ])
+
+with open("triangles.pkl", "rb") as f:
+    model = np.array(pickle.load(f))
+    print(model.shape)
 
 
 
