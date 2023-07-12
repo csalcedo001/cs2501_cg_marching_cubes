@@ -1,4 +1,5 @@
 import numpy as np
+import json
 
 CUBE_CORNERS = np.array([
     [0, 0, 0],
@@ -51,7 +52,7 @@ def get_values_from_function(f, x_points, y_points, z_points):
     
     return values
 
-def get_triangles_from_values(values, threshold):
+def get_triangles_from_values(values, scale, threshold):
     triangles = []
 
     for i in range(values.shape[0] - 1):
@@ -63,9 +64,33 @@ def get_triangles_from_values(values, threshold):
                 corners = values[point_idx]
                 signs = corners > threshold
 
-                case_idx = np.sum(2 ** signs)
-                case_triangles = TRIANGLE_CASES[case_idx] + ref_idx
+                case_idx = int(np.sum(2 ** signs))
+                case_triangles = TRIANGLE_CASES[case_idx]
+                case_triangles *= scale
+                case_triangles += ref_idx
 
                 triangles += case_triangles.tolist()
     
     return triangles
+
+def get_case_table(table_of_case_vertices):
+    table_of_case_triangles = []
+    for case_vertices in table_of_case_vertices:
+        raw_case_triangles = np.split(case_vertices, 3)
+
+        case_triangles = []
+        for triangle in raw_case_triangles:
+            if triangle[0] == -1:
+                break
+            
+            case_triangles.append(triangle)
+        
+        table_of_case_triangles.append(case_triangles)
+    
+    return table_of_case_triangles
+
+
+with open("triangles.json", "r") as f:
+    table_of_case_vertices = np.array(json.load(f))
+
+TRIANGLE_CASES = get_case_table(table_of_case_vertices)
