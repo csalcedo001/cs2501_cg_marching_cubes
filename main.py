@@ -117,7 +117,7 @@ while run:
         glLoadIdentity()
 
         # apply the movment
-        speed = 0.1
+        speed = 0.2
         if keypress[pygame.K_w]:
             glTranslatef(0, 0, speed)
         if keypress[pygame.K_s]:

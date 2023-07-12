@@ -24,7 +24,7 @@ def grid_func(x, y, z, grid, y_scale=1):
 
 parser = ArgumentParser()
 parser.add_argument("--threshold", type=float, default=0.5)
-parser.add_argument("--step", type=float, default=15)
+parser.add_argument("--step", type=float, default=50)
 
 args = parser.parse_args()
 
@@ -47,13 +47,16 @@ grid = np.transpose(grid, (1, 0, 2))    # Transpose to match the orientation of 
 print("Grid shape:", grid.shape)
 
 
+y_scale = 10
+
 lower_bound = np.zeros((3,))
 upper_bound = np.ones((3,)) * (np.array(grid.shape) - 1)
+upper_bound[1] *= y_scale
 
-f = lambda x, y, z: grid_func(x, y, z, grid, y_scale=5)
+f = lambda x, y, z: grid_func(x, y, z, grid, y_scale=y_scale)
 
 
-triangles = marching_cubes(f, args.threshold, lower_bound, upper_bound, step=args.step)
+triangles = marching_cubes(f, args.threshold, lower_bound, upper_bound, step=args.step) / args.step
 print("Shape of triangle mesh:", triangles.shape)
 
 with open("model.pkl", "wb") as f:
