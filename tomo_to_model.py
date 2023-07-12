@@ -1,14 +1,15 @@
 import pickle
 import numpy as np
 from argparse import ArgumentParser
+from PIL import Image
 
 from marching_cubes import marching_cubes
 
 
 
-def grid_func(x, y, z, grid):
+def grid_func(x, y, z, grid, depth_scale=1):
     x = int(x)
-    y = int(y)
+    y = int(y / depth_scale)
     z = int(z)
 
     if x < 0 or x >= grid.shape[0]:
@@ -23,6 +24,7 @@ def grid_func(x, y, z, grid):
 
 parser = ArgumentParser()
 parser.add_argument("--threshold", type=float, default=0.5)
+parser.add_argument("--step", type=float, default=15)
 
 args = parser.parse_args()
 
@@ -31,16 +33,27 @@ values = np.arange(5).reshape(1, 1, 5) + np.arange(5).reshape(1, 5, 1) + np.aran
 values = values ** 2
 values = values / np.max(values)
 
-grid = values
+tomo = []
+for i in range(40):
+    img_path = f'data/mri_{i}.bmp'
+    img = np.array(Image.open(img_path))
+    tomo.append(img)
+tomo = np.array(tomo)
+print("Tomography shape:", tomo.shape)
+
+grid = tomo.mean(axis=3)                # Gray scale
+grid = grid / 255                       # [0, 1] range
+grid = np.transpose(grid, (1, 0, 2))    # Transpose to match the orientation of the MRI
+print("Grid shape:", grid.shape)
 
 
 lower_bound = np.zeros((3,))
 upper_bound = np.ones((3,)) * (np.array(grid.shape) - 1)
 
-f = lambda x, y, z: grid_func(x, y, z, grid)
+f = lambda x, y, z: grid_func(x, y, z, grid, depth_scale=5)
 
 
-triangles = marching_cubes(f, args.threshold, lower_bound, upper_bound, step=1)
+triangles = marching_cubes(f, args.threshold, lower_bound, upper_bound, step=args.step)
 print("Shape of triangle mesh:", triangles.shape)
 
 with open("model.pkl", "wb") as f:
