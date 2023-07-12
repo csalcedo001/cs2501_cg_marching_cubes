@@ -118,22 +118,3 @@ with open("triangle_table.json", "r") as f:
     table_of_case_vertices = np.array(json.load(f))[:, :-1]
 
 TRIANGLE_CASES = get_case_table(table_of_case_vertices)
-
-if __name__ == "__main__":
-    radius = 1.5
-    plot_range_scale = 2
-    threshold = 0
-    step = 1
-
-    print("Scanning through", ((plot_range_scale * 2) // step) ** 3, "boxes")
-
-    def f(x, y, z):
-        return x ** 2 + y ** 2 + z ** 2 - radius ** 2
-
-    bound = plot_range_scale * np.ones((3,))
-
-    triangles = marching_cubes(f, threshold, -bound, bound, step)
-    print("Shape of triangle mesh:", triangles.shape)
-
-    with open("triangles.pkl", "wb") as f:
-        pickle.dump(triangles, f)

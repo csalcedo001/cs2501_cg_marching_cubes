@@ -18,7 +18,7 @@ def get_normal(triangle):
 
 blues = matplotlib.cm.get_cmap('Blues')
 
-def shade(triangle, light, color_map=blues):
+def get_color(triangle, light, color_map=blues):
     normal = get_normal(triangle)
     lighting = np.dot(normal, light / np.linalg.norm(light))
     color = color_map(1 - lighting)
@@ -42,20 +42,7 @@ light = np.array([1, 2, 3])
 
 
 
-
-
-model = np.array([
-    [(1,0,0), (0,1,0), (0,0,1)],
-    [(1,0,0), (0,0,-1), (0,1,0)],
-    [(1,0,0), (0,0,1), (0,-1,0)],
-    [(1,0,0), (0,-1,0), (0,0,-1)],
-    [(-1,0,0), (0,0,1), (0,1,0)],
-    [(-1,0,0), (0,1,0), (0,0,-1)],
-    [(-1,0,0), (0,-1,0), (0,0,1)],
-    [(-1,0,0), (0,0,-1), (0,-1,0)],
-])
-
-with open("triangles.pkl", "rb") as f:
+with open("model.pkl", "rb") as f:
     model = np.array(pickle.load(f))
     print(model.shape)
 
@@ -159,13 +146,13 @@ while run:
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
         glBegin(GL_TRIANGLES)
         for face in model:
-            color = shade(face, light, blues)
+            color = get_color(face, light, blues)
             for vertex in face:
                 glColor3fv((color[0], color[1], color[2]))
                 glVertex3fv(vertex)
         glEnd()
 
-        print(clock.get_fps())
+        # print(clock.get_fps())
 
         glPopMatrix()
 
